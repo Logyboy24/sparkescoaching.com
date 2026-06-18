@@ -1064,27 +1064,25 @@ async function handlePayment(type, basePrice) {
   }
 
   try {
-    // PRODUCTION FLOW (commented out — requires backend):
-    // const res = await fetch('/create-payment-intent', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ amount: basePrice * 100, currency: 'usd', type })
-    // });
-    // const { clientSecret } = await res.json();
-    // const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-    //   payment_method: { card: cardElement, billing_details: { name, email } }
-    // });
-    // if (error) throw error;
+const res = await fetch('https://sparkes-backend.vercel.app/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, swimmerName: name, swimmerEmail: email, swimmerCount: count, date: selectedDay, time: selectedTime.label })
+    });
+    const { clientSecret, error: backendError } = await res.json();
+    if (backendError) throw new Error(backendError);
 
-    // Demo simulation:
-    setTimeout(() => {
-      if (selectedDay && selectedTime) {
-        if (!bookedSlots[selectedDay]) bookedSlots[selectedDay] = [];
-        bookedSlots[selectedDay].push(selectedTime.hour);
-      }
-      showSuccess(type, name);
-      buildCalendar();
-    }, 1500);
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardElement, billing_details: { name, email } }
+    });
+    if (error) throw error;
+
+    if (selectedDay && selectedTime) {
+      if (!bookedSlots[selectedDay]) bookedSlots[selectedDay] = [];
+      bookedSlots[selectedDay].push(selectedTime.hour);
+    }
+    showSuccess(type, name);
+    buildCalendar();
   } catch(err) {
     btn.disabled = false;
     btn.textContent = `Pay $${basePrice}.00 & confirm booking`;
