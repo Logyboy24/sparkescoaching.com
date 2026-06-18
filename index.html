@@ -1001,9 +1001,13 @@ function openBookingWithDetails() {
   setTimeout(() => {
     if (window.stripeLoaded) {
       mountStripe();
+} else {
+      stripe = Stripe('pk_live_51TgniFF9s90G4q8FQgLEAii3LRHxYuK2rFGLmQ2wTTpaPI24ybb9CUJOaVT7MY8pLZQfyZ6evQsQ4oxa9gklCBWS00AVXoXtU1');
+      elements = stripe.elements();
+      window.stripeLoaded = true;
+      mountStripe();
     }
-  }, 100);
-}
+  }, 300);
 
 let stripe, elements, cardElement;
 window.stripeLoaded = false;
