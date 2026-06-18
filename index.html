@@ -1047,6 +1047,7 @@ function mountStripe() {
 async function handlePayment(type, basePrice) {
   const name = document.getElementById('swimmer-name')?.value?.trim();
   const email = document.getElementById('swimmer-email')?.value?.trim();
+  const count = type === 'group' ? (parseInt(document.getElementById('swimmer-count')?.value) || 1) : 1;
 
   if (!name || !email) {
     alert('Please enter your name and email.');
